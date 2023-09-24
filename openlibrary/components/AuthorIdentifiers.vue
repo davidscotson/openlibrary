@@ -5,12 +5,13 @@
         <select class="form-control" v-model="selectedIdentifier" name="name">
           <option disabled value="">Select one</option>
           <option v-for="idConfig in identifierConfigsByKey" :key="idConfig.name" :value="idConfig.name">
-            {{idConfig.label}}
+            {{ idConfig.label }}
           </option>
         </select>
       </th>
       <th>
-        <input class="form-control" type="text" name="value" id="id-value" v-model.trim="inputValue" @keyup.enter=setIdentifier>
+        <input class="form-control" type="text" name="value" id="id-value" v-model.trim="inputValue"
+          @keyup.enter=setIdentifier>
       </th>
       <th>
         <button class="form-control" name="set" :disabled="!setButtonEnabled" @click=setIdentifier>Set</button>
@@ -29,7 +30,7 @@
 </template>
 
 <script>
-const identifierPatterns  = {
+const identifierPatterns = {
     wikidata: /^Q[1-9]\d*$/i,
     isni: /^[0]{4} ?[0-9]{4} ?[0-9]{4} ?[0-9]{3}[0-9X]$/i,
     storygraph: /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i,
@@ -40,15 +41,15 @@ export default {
     // Props are for external options; if a subelement of this is modified,
     // the view automatically re-renders
     props: {
-        /** The list of ids currently associated with the entity in the database in string form */
+    /** The list of ids currently associated with the entity in the database in string form */
         assigned_ids_string: {
             type: String,
             //default: () =>  "{'wikidata': 'Q10000'}"
         },
         /** everything from https://openlibrary.org/config/author
-         * Most importantly:
-         * {"identifiers": [{"label": "ISNI", "name": "isni", "notes": "", "url": "http://www.isni.org/@@@", "website": "http://www.isni.org/"}, ... ]}
-         */
+ * Most importantly:
+ * {"identifiers": [{"label": "ISNI", "name": "isni", "notes": "", "url": "http://www.isni.org/@@@", "website": "http://www.isni.org/"}, ... ]}
+ */
         author_config_string: {
             type: String
         },
@@ -69,17 +70,17 @@ export default {
     },
 
     computed: {
-        identifierConfigsByKey: function(){
+        identifierConfigsByKey: function () {
             const parsedConfigs = JSON.parse(decodeURIComponent(this.author_config_string))['identifiers'];
             return Object.fromEntries(parsedConfigs.map(e => [e.name, e]));
         },
-        setButtonEnabled: function(){
+        setButtonEnabled: function () {
             return this.selectedIdentifier !== '' && this.inputValue !== '';
         }
     },
 
     methods: {
-        setIdentifier: function(){
+        setIdentifier: function () {
             // if no identifier selected don't execute
             if (!this.setButtonEnabled) return
 
@@ -94,43 +95,44 @@ export default {
             this.selectedIdentifier = '';
         },
         /** Removes an identifier with value from memory and it will be deleted from database on save */
-        removeIdentifier: function(identifierName){
+        removeIdentifier: function (identifierName) {
             this.$set(this.assignedIdentifiers, identifierName, '');
         },
-        createHiddenInputs: function(){
+
+        createHiddenInputs: function () {
             /** Right now, we have a vue component embedded as a small part of a larger form
-              * There is no way for that parent form to automatically detect the inputs in a component without JS
-              * This is because the vue component is in a shadow dom
-              * So for now this just drops the hidden inputs into the the parent form anytime there is a change
-              */
+  * There is no way for that parent form to automatically detect the inputs in a component without JS
+  * This is because the vue component is in a shadow dom
+  * So for now this just drops the hidden inputs into the the parent form anytime there is a change
+  */
             const html = Object.entries(this.assignedIdentifiers)
                 .map(([name, value]) => `<input type="hidden" name="author--remote_ids--${name}" value="${value}"/>`)
                 .join('');
             document.querySelector(this.output_selector).innerHTML = html;
         },
-        selectIdentifierByInputValue: function() {
+        selectIdentifierByInputValue: function () {
             // Selects the dropdown identifier based on the input value when possible
             for (const idtype in identifierPatterns) {
-                if (this.inputValue.match(identifierPatterns[idtype])){
+                if (this.inputValue.match(identifierPatterns[idtype])) {
                     this.selectedIdentifier = idtype;
                     break;
                 }
             }
         }
     },
-    created: function(){
+    created: function () {
         this.assignedIdentifiers = JSON.parse(decodeURIComponent(this.assigned_ids_string));
     },
     watch: {
         assignedIdentifiers:
-            {
-                handler: function(){this.createHiddenInputs()},
-                deep: true
-            },
+    {
+        handler: function () { this.createHiddenInputs() },
+        deep: true
+    },
         inputValue:
-            {
-                handler: function(){this.selectIdentifierByInputValue()},
-            },
+    {
+        handler: function () { this.selectIdentifierByInputValue() },
+    },
     }
 }
 </script>
@@ -140,23 +142,29 @@ export default {
 select.form-control {
   height: calc(2.25rem + 2px);
 }
+
 .form-control {
   padding: .375rem .75rem;
   font-size: 1rem;
   line-height: 1.5;
   border: 1px solid #ced4da;
 }
+
 table {
   background-color: #f6f5ee;
   border-collapse: collapse;
 }
+
 th {
   text-align: left;
 }
+
 td {
   border-top: 1px solid #ddd;
 }
-th, td {
+
+th,
+td {
   padding: .25rem;
 }
 </style>
