@@ -1,4 +1,4 @@
-import { validateIdentifiers } from '../../../openlibrary/plugins/openlibrary/js/edit.js';
+import { initIdentifierValidation } from '../../../openlibrary/plugins/openlibrary/js/edit.js';
 import sinon from 'sinon';
 import * as testData from './html-test-data';
 import { htmlquote } from '../../../openlibrary/plugins/openlibrary/js/jsdef';
@@ -34,10 +34,7 @@ beforeEach(() => {
     jQueryRepeat(global.$);
     // setup the HTML
     $(document.body).html(testData.editionIdentifiersSample);
-    $('#identifiers').repeat({
-        vars: {prefix: 'edition--'},
-        validate: function(data) {return validateIdentifiers(data)},
-    });
+    initIdentifierValidation();
 });
 
 // Per the test data used, and beforeEach(), the length always starts out at 5.
