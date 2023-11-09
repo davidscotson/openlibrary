@@ -11,8 +11,10 @@ import {
 } from './idValidation';
 import { extractWorkIdFromUrl, } from './idExtraction';
 import { extractEditionIdFromUrl, } from './idExtraction';
+import { extractAuthorIdFromUrl, } from './idExtraction';
 import { detectTypeFromWorkId, } from './idDetection';
 import { detectTypeFromEditionId, } from './idDetection';
+import { detectTypeFromAuthorId, } from './idDetection';
 /* global render_seed_field, render_language_field, render_lazy_work_preview, render_language_autocomplete_item, render_work_field, render_work_autocomplete_item */
 /* Globals are provided by the edit edition template */
 
@@ -279,6 +281,33 @@ export function initWorkIdentifierValidation() {
     });
 }
 
+export function initAuthorIdentifierValidation() {
+    $('#authoridentifiers').repeat({
+        vars: {prefix: 'author--'},
+        validate: function(data) {return validateAuthorIdentifiers(data)},
+    });
+    $('#authoridentifiers').on('repeat-add', function () {
+        $('#authorselect-id option').first().prop('selected',true);
+    });
+    $('#authorid-value').on('input', function () {
+        const input = $('#authorid-value').val().trim();
+        $('#authorid-value').val(input);
+        if (/^https?:/.test(input)) {
+            const [id, type] = extractAuthorIdFromUrl(input);
+            if (id && type) {
+                $('#authorselect-id').val(type);
+                $('#authorid-value').val(id);
+            }
+        } else {
+
+            const type = detectTypeFromAuthorId(input);
+            if (type) {
+                $('#authorselect-id').val(type);
+            }
+        }
+    });
+}
+
 export function initClassificationValidation() {
     const dataConfig = JSON.parse(document.querySelector('#classifications').dataset.config);
     $('#classifications').repeat({
@@ -330,6 +359,29 @@ export function validateWorkIdentifiers(data) {
     if (validId === false) return false;
 
     $('#workid-errors').hide();
+    return true;
+}
+
+/**
+ * Called by initAuthorIdentifierValidation(), along with tests in
+ * tests/unit/js/editAuthorPage.test.js, to validate the addition of new
+ * identifiers (wikidata, viaf) to an author.
+ * @param {Object} data  data from the input form
+ * @returns {boolean}  true if identifier passes validation
+ */
+export function validateAuthorIdentifiers(data) {
+    const dataConfig = JSON.parse(document.querySelector('#authoridentifiers').dataset.config);
+
+    if (data.name === '' || data.name === '---') {
+        return error('#authorid-errors', 'authorselect-id', dataConfig['Please select an identifier.'])
+    }
+    const option = $('#authorselect-id').find(`option[value='${data.name}']`);
+    const label = option.html();
+    if (data.value === '') {
+        return error('#authorid-errors', 'authorid-value', dataConfig['You need to give a value to ID.'].replace(/ID/, label));
+    }
+
+    $('#authorid-errors').hide();
     return true;
 }
 

@@ -27,6 +27,18 @@ const validEditionData = [
         type: 'project_gutenberg',
         id: '1906',
     },
+    {
+        desc: 'librivox edition',
+        url: 'https://librivox.org/5231/',
+        type: 'librivox',
+        id: '5231',
+    },
+    {
+        desc: 'librivox edition rss button link',
+        url: 'https://librivox.org/rss/5231',
+        type: 'librivox',
+        id: '5231',
+    },
 ];
 
 const invalidEditionData = [

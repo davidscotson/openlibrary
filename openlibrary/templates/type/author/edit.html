@@ -113,10 +113,74 @@ $:macros.HiddenSaveButton("addAuthor")
                             </div>
                         </div>
                         <div class="label">Identifiers <a href="/help/faq/editing.en#author-identifiers-purpose"><img src="/images/icons/icon_help.png" alt="$_('Author Identifiers Purpose')"/></a> </div>
-                        <div id="hiddenIdentifierInputs"></div>
-                        <div id="identifiers-display">
-                            $:render_component('AuthorIdentifiers', attrs=dict(assigned_ids_string=dict(page.remote_ids),output_selector='#hiddenIdentifierInputs',author_config_string=dict(get_author_config())))
+                $ author_config = get_author_config();
+                $ config = ({
+                    $ 'Please select an identifier.': _('Please select an identifier.'),
+                    $ 'You need to give a value to ID.': _('You need to give a value to ID.'),
+                    $ 'ID ids cannot contain whitespace.': _('ID ids cannot contain whitespace.'),
+                    $ 'That ID already exists for this author.': _('That ID already exists for this author.'),
+                    $ 'Invalid ID format': _('Invalid ID format')
+                $ })
+                <fieldset class="major" id="authoridentifiers" data-config="$dumps(config)">
+                    <legend>$_("ID Numbers")</legend>
+                    <div class="formBack">
+
+                        <div id="authorid-errors" class="note" style="display: none"></div>
+                        <div class="formElement">
+                            <div class="label">
+                                <label for="authorselect-id">$_("Do you know any identifiers for this author?")</label>
+                                <span class="tip">$_("Like, VIAF?")</span>
+                            </div>
+                            <div class="input">
+                                <table class="identifiers">
+                                    <tr id="authoridentifiers-form">
+                                        <td align="right">
+                                            <select name="name" id="authorselect-id">
+                                            $ id_labels = dict((d.name, d.label) for d in author_config.identifiers)
+                                            $ id_dict = dict((id.name, id) for id in author_config.identifiers)
+
+                                            <option value="">$_('Select one of many...')</option>
+                                            $for id in author_config.identifiers:
+                                                <option value="$id.name">$id.label</option>
+
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="value" id="authorid-value"/>
+                                        </td>
+                                        <td>
+                                            <button type="button" name="add" class="repeat-add larger">$_("Add")</button>
+                                        </td>
+                                    </tr>
+                                    <tbody id="authoridentifiers-display">
+                                        <tr id="authoridentifiers-template"  style="display: none;" class="repeat-item">
+                                            <td align="right"><strong>{{\$("#authorselect-id").find("option[value='" + name + "']").html()}}</strong></td>
+                                            <td data-type="{{name}}">{{value}}
+                                              <input type="hidden" name="{{prefix}}remote_ids--{{name}}" value="{{value}}"/>
+                                            </td>
+                                            <td><a href="javascript:;" class="repeat-remove red plain" title="Remove this identifier">[x]</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right">Open Library</td>
+                                            <td>$page.key.split("/")[-1]</td>
+                                            <td></td>
+                                        </tr>
+                                        $ remote_ids = dict(page.remote_ids)
+                                        $for (name, value) in remote_ids.items():
+                                           $ href = id_dict[name].url.replace('@@@', value)
+                                           <tr id="authoridentifiers--$name" data-type="$name" class="repeat-item">
+                                            <td align="right"><strong>$id_labels.get(name, name)</strong></td>
+                                            <td>$value
+                                                <input class="$name" type="hidden" name="author--remote_ids--$name" value="$value"/>
+                                            </td>
+                                            <td><a href="javascript:;" class="repeat-remove red plain" title="Remove this identifier">[x]</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+                    </div>
+                </fieldset>
 
                         $if page.website:
                             $if ctx.user and ctx.user.is_admin():
