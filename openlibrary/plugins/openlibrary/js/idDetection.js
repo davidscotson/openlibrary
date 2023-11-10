@@ -9,6 +9,14 @@ const workIdentifierPatterns  = {
     amazon: commonRegex.amazon,
     storygraph: commonRegex.storygraph,
 }
+const authorIdentifierPatterns  = {
+    wikidata: commonRegex.wikidata,
+    storygraph: commonRegex.storygraph,
+    amazon: commonRegex.amazon,
+    storygraph: commonRegex.storygraph,
+    isni: /^[0]{4} ?[0-9]{4} ?[0-9]{4} ?[0-9]{3}[0-9X]$/i,
+    youtube: /^@[A-Za-z0-9_\-.]{3,30}/,
+}
 const editionIdentifierPatterns  = {
     wikidata: commonRegex.wikidata,
     amazon: commonRegex.amazon,
@@ -22,6 +30,14 @@ const editionIdentifierPatterns  = {
  */
 export function detectTypeFromWorkId(id) {
     return detectTypeFromId(id, workIdentifierPatterns);
+}
+/**
+ * Compares url string against regex patters to extract author identifier.
+ * @param {String} id string to test
+ * @returns {String} identifier type name e.g. 'wikidata' or null
+ */
+export function detectTypeFromAuthorId(id) {
+    return detectTypeFromId(id, authorIdentifierPatterns);
 }
 /**
  * Compares url string against regex patters to extract author identifier.

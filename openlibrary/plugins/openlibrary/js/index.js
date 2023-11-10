@@ -127,6 +127,7 @@ jQuery(function () {
     const addRowButton = document.getElementById('add_row_button');
     const roles = document.querySelector('#roles');
     const identifiers = document.querySelector('#identifiers');
+    const authorIdentifiers = document.querySelector('#authoridentifiers');
     const workIdentifiers = document.querySelector('#workidentifiers');
     const classifications = document.querySelector('#classifications');
     const excerpts = document.getElementById('excerpts');
@@ -165,6 +166,9 @@ jQuery(function () {
                 }
                 if (workIdentifiers) {
                     module.initWorkIdentifierValidation();
+                }
+                if (authorIdentifiers) {
+                    module.initAuthorIdentifierValidation();
                 }
                 if (classifications) {
                     module.initClassificationValidation();

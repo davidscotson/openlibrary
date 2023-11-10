@@ -16,6 +16,25 @@ const workIdentifierExtractionPatterns = {
     goodreads: /^https?:\/\/www\.goodreads\.com\/work\/editions\/(\d+)/,
 
 }
+const authorIdentifierExtractionPatterns = {
+    wikidata: commonRegex.wikidata,
+    viaf: commonRegex.viaf,
+    storygraph: /^https?:\/\/app\.thestorygraph\.com\/authors\/([0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12})$/,
+    // librarything regex from https://www.wikidata.org/wiki/Property:P7400#P8966
+    librarything: /^https?:\/\/www\.librarything\.(?:com|nl)\/author\/(\S+)/,
+    // goodreads regex from https://www.wikidata.org/wiki/Property:P2963#P8966
+    goodreads: /^https?:\/\/www\.goodreads\.com\/author\/(?:show|list)\/(\d+)/,
+    // youtube handle regex from https://www.wikidata.org/wiki/Property:P11245#P8966
+    // note: we adjust the regex to keep the @ symbol, which wikidata skips
+    youtube: /^https:\/\/www\.youtube\.com\/(@[A-Za-z0-9_\-.]{3,30})/,
+    // librivox regex from https://www.wikidata.org/wiki/Property:P1899#P8966
+    librivox: /^https?:\/\/librivox\.org\/author\/(\d+)/,
+    // project gutenberg author regex from https://www.wikidata.org/wiki/Property:P1938#P8966
+    project_gutenberg: /^https?:\/\/www\.gutenberg\.org\/ebooks\/author\/([1-9]\d{0,4})/,
+    // isni regex from https://www.wikidata.org/wiki/Property:P213#P8966
+    // note we adjust the regex as we don't care about the spaces
+    isni: /^https?:\/\/(?:www\.)?isni\.org\/isni\/(\d{4}\d{4}\d{4}\d{3}[\dX])$/,
+}
 const editionIdentifierExtractionPatterns = {
     wikidata: commonRegex.wikidata,
     storygraph: commonRegex.storygraph,
@@ -30,6 +49,10 @@ const editionIdentifierExtractionPatterns = {
     isfdb: /^https?:\/\/www\.isfdb\.org\/cgi-bin\/pl\.cgi\?(\d+)/,
     // project gutenberg regex from https://www.wikidata.org/wiki/Property:P2034#P8966
     project_gutenberg: /^https?:\/\/(?:www\.)?gutenberg\.org\/ebooks\/([1-9]\d*)/,
+    // I'ts not clear how to access these urls from the site, so not sure how useful this is
+    // e.g. https://librivox.org/through-the-looking-glass-dramatic-reading-by-lewis-carroll/
+    // is the same as https://librivox.org/5231 but with no obvious link except the RSS feed
+    librivox: /^https?:\/\/librivox\.org\/(?:rss\/)?(\d+)($|\/|\?|#)/,
 }
 
 /**
@@ -47,6 +70,14 @@ export function extractWorkIdFromUrl(url) {
  */
 export function extractEditionIdFromUrl(url) {
     return extractIdFromUrl(url, editionIdentifierExtractionPatterns);
+}
+/**
+ * Compares url string against regex patters to extract author identifier.
+ * @param {String} url
+ * @returns {Array} [author identifier, identifier type] or null, null
+ */
+export function extractAuthorIdFromUrl(url) {
+    return extractIdFromUrl(url, authorIdentifierExtractionPatterns);
 }
 /**
  * Compares url string against regex patters to extract identifier.
