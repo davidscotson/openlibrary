@@ -10,7 +10,9 @@ import {
     isIdDupe
 } from './idValidation';
 import { extractWorkIdFromUrl, } from './idExtraction';
+import { extractEditionIdFromUrl, } from './idExtraction';
 import { detectTypeFromWorkId, } from './idDetection';
+import { detectTypeFromEditionId, } from './idDetection';
 /* global render_seed_field, render_language_field, render_lazy_work_preview, render_language_autocomplete_item, render_work_field, render_work_autocomplete_item */
 /* Globals are provided by the edit edition template */
 
@@ -229,6 +231,25 @@ export function initIdentifierValidation() {
     $('#identifiers').repeat({
         vars: {prefix: 'edition--'},
         validate: function(data) {return validateIdentifiers(data)},
+    });
+    $('#identifiers').on('repeat-add', function () {
+        $('#select-id option').first().prop('selected',true);
+    });
+    $('#id-value').on('input', function () {
+        const input = $('#id-value').val().trim();
+        $('#id-value').val(input);
+        if (/^https?:/.test(input)) {
+            const [id, type] = extractEditionIdFromUrl(input);
+            if (id && type) {
+                $('#select-id').val(type);
+                $('#id-value').val(id);
+            }
+        } else {
+            const type = detectTypeFromEditionId(input);
+            if (type) {
+                $('#select-id').val(type);
+            }
+        }
     });
 }
 
